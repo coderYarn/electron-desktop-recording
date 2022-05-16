@@ -9,7 +9,9 @@
         <div class="item" @click="handlerClose">关闭</div>
       </div>
     </header>
-    <slot></slot>
+    <div class="layer">
+      <slot></slot>
+    </div>
   </div>
 </template>
 
@@ -74,5 +76,8 @@ header {
 }
 .item {
   margin-right: 10px;
+}
+.layer{
+  position: relative;
 }
 </style>

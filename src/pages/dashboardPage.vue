@@ -1,51 +1,46 @@
 <template>
-  <div>
-    <Layer>
-      <div class="recordMain">
-        <div class="content">
-          <div class="btnBox">
-            <div>
-              <div class="btn" @click="sourceStart">
-                {{ isRecord ? '结束录制' : '录屏' }}
-              </div>
-              <div class="timer">{{ transTime(timestamp) }}</div>
+
+  <Layer>
+    <div class="recordMain">
+      <div class="content">
+        <div class="btnBox">
+          <div>
+            <div class="btn" @click="sourceStart">
+              {{ isRecord ? '结束录制' : '录屏' }}
             </div>
-          </div>
-          <div class="videoList">
-            <div class="list">
-              <div class="table">
-                <div class="table-line" :key="item" v-for="item in files">
-                  <div>{{ item }}</div>
-                  <div
-                    @click="handlerPlay(item)"
-                    v-if="sourceList.length > 0 ? true : false"
-                  >
-                    播放
-                  </div>
-                  <div @click="openDir(item)">打开文件目录</div>
-                </div>
-              </div>
-            </div>
+            <div class="timer">{{ transTime(timestamp) }}</div>
           </div>
         </div>
-        <div class="preview">
-          <!-- <video :src="previewImg"></video> -->
-          <img :src="previewImg" v-if="videoUrl === ''" />
-          <video
-            controls
-            :src="`http://localhost:9000/${videoUrl}`"
-            v-else
-          ></video>
+        <div class="videoList">
+          <div class="list">
+            <div class="table">
+                     <div class="table-line" >
+                <div>片原名</div>
+                <div>
+                  播放
+                </div>
+                <div >打开文件目录</div>
+              </div>
+              <div class="table-line" :key="item" v-for="item in files">
+                <div>{{ item }}</div>
+                <div @click="handlerPlay(item)" v-if="sourceList.length > 0 ? true : false">
+                  播放
+                </div>
+                <div @click="openDir(item)">打开文件目录</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+      <div class="preview">
+        <!-- <video :src="previewImg"></video> -->
+        <img :src="previewImg" v-if="videoUrl === ''" />
+        <video controls :src="`http://localhost:9000/${videoUrl}`" v-else></video>
+      </div>
+    </div>
 
-      <RecordList
-        @recrodWin="recrodWin"
-        :sourceList="sourceList"
-        :show="show"
-      />
-    </Layer>
-  </div>
+    <RecordList @exitDia="exitDia" @recrodWin="recrodWin" :sourceList="sourceList" :show="show" />
+  </Layer>
 </template>
 
 <script>
@@ -137,6 +132,7 @@ export default defineComponent({
       }
     }
     const sourceStart = async () => {
+      if (show.value) return
       const source = await getSource()
 
       sourceList.value = source.map((item) => {
@@ -181,10 +177,12 @@ export default defineComponent({
     const openDir = (item) => {
       ipcRenderer.send('directory-open', item)
     }
+    const exitDia = (flag) => {
+      show.value = flag
+    }
     const recrodWin = (item) => {
       sourceId.value = item.id
       show.value = item.show
-      console.log(!isRecord.value)
       if (!isRecord.value) {
         ipcRenderer.send('startRecord')
       }
@@ -203,7 +201,8 @@ export default defineComponent({
       openDir,
       sourceList,
       show,
-      recrodWin
+      recrodWin,
+      exitDia
     }
   }
 })
@@ -211,11 +210,15 @@ export default defineComponent({
 
 <style scope>
 .recordMain {
+  width: 100%;
+  height: 100%;
   display: flex;
 }
+
 .content {
   width: 40%;
 }
+
 .preview {
   display: flex;
   align-items: center;
@@ -224,12 +227,14 @@ export default defineComponent({
   padding: 10px;
   box-sizing: border-box;
 }
+
 .btnBox {
   height: 20vh;
   display: flex;
   align-items: center;
   justify-content: center;
 }
+
 .btn {
   background: red;
   width: 8vh;
@@ -240,20 +245,25 @@ export default defineComponent({
   color: #fff;
   font-weight: bold;
 }
+
 .videoList {
   height: calc(80vh - 50px);
   padding: 15px;
   box-sizing: border-box;
 }
+
 .list {
   border: solid 1px red;
   height: 100%;
   border-radius: 10px;
+  overflow-y: scroll;
 }
+
 .table {
   padding: 0 10px;
   box-sizing: border-box;
 }
+
 .table-line {
   display: flex;
   justify-content: space-around;
@@ -261,16 +271,19 @@ export default defineComponent({
   height: 30px;
   align-items: center;
 }
+
 img {
   width: 100%;
   background: #ccc;
   background-size: cover;
 }
+
 video {
   width: 100%;
   background: #ccc;
   background-size: cover;
 }
+
 .item {
   cursor: pointer;
 }

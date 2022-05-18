@@ -1,12 +1,28 @@
 <template>
-  <div>
-    <header v-mouse-drag="handleDrag">
+  <div class="layer">
+    <header v-mouse-drag="handleDrag" v-mouse-db="handlerMaximize">
       <div class="logo">Logo</div>
       <div class="muen">
-        <div class="item" @click="handlerMinimize">隐藏</div>
-        <div class="item" @click="handlerMaximize" v-if="isMax">最大化</div>
-        <div class="item" @click="handlerRestore" v-else>回复</div>
-        <div class="item" @click="handlerClose">关闭</div>
+        <div class="item" @click="handlerMinimize">
+          <n-icon size="20">
+            <RemoveSharp />
+          </n-icon>
+        </div>
+        <div class="item" @click="handlerMaximize" v-if="isMax">
+          <n-icon size="20">
+            <ExpandSharp />
+          </n-icon>
+        </div>
+        <div class="item" @click="handlerRestore" v-else>
+          <n-icon size="20">
+            <TabletLandscapeOutline />
+          </n-icon>
+        </div>
+        <div class="item" @click="handlerClose">
+          <n-icon size="20">
+            <CloseSharp />
+          </n-icon>
+        </div>
       </div>
     </header>
     <div class="layer">
@@ -16,20 +32,30 @@
 </template>
 
 <script>
-
 import { ref, defineComponent } from 'vue'
+
+import {
+  TabletLandscapeOutline,
+  CloseSharp,
+  ExpandSharp,
+  RemoveSharp
+} from '@vicons/ionicons5'
 const { ipcRenderer } = window.require('electron')
 export default defineComponent({
   // eslint-disable-next-line vue/multi-word-component-names
   name: 'Layer',
-
+  components: {
+    RemoveSharp,
+    CloseSharp,
+    ExpandSharp,
+    TabletLandscapeOutline
+  },
   setup (props) {
     const isMax = ref(true)
     const handleDrag = (pos) => {
       ipcRenderer.send('move-main', pos)
     }
     const handlerMinimize = () => {
-      console.log('mainwin-maxize')
       ipcRenderer.send('mainwin-minize')
     }
     const handlerMaximize = () => {
@@ -37,7 +63,7 @@ export default defineComponent({
         isMax.value = false
         ipcRenderer.send('mainwin-maxize')
       } else {
-        isMax.value = false
+        isMax.value = true
         ipcRenderer.send('mainwin-restore')
       }
     }
@@ -46,8 +72,10 @@ export default defineComponent({
     }
     const handlerRestore = () => {
       isMax.value = true
+
       ipcRenderer.send('mainwin-restore')
     }
+
     return {
       handleDrag,
       handlerMinimize,
@@ -61,23 +89,41 @@ export default defineComponent({
 </script>
 
 <style scope>
+.layer {
+  background: #101014;
+}
+
 header {
   height: 50px;
-  background: #000;
+  background: #26262a;
   color: #fff;
   display: flex;
-  padding: 0 20px;
+
   box-sizing: border-box;
   justify-content: space-between;
   align-items: center;
 }
+
 .muen {
+  height: 100%;
   display: flex;
+  align-items: center;
 }
+
 .item {
-  margin-right: 10px;
+  width: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
 }
-.layer{
+.item:hover {
+  background: #111;
+}
+.item:nth-child(3):hover {
+  background: red;
+}
+.layer {
   position: relative;
 }
 </style>

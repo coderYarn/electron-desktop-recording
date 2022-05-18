@@ -1,6 +1,8 @@
 {
   "name": "record-electron",
   "version": "0.1.0",
+  "author": "coderYarn",
+  "description": "本地录屏app",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -13,8 +15,12 @@
   },
   "main": "background.js",
   "dependencies": {
+    "@vicons/ionicons5": "^0.12.0",
     "core-js": "^3.8.3",
     "entities": "^4.0.0",
+    "naive-ui": "^2.28.4",
+    "normalize.css": "^8.0.1",
+    "sass": "^1.51.0",
     "vue": "^3.2.13",
     "vue-router": "^4.0.3"
   },
@@ -33,6 +39,8 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^5.1.0",
     "eslint-plugin-vue": "^8.0.3",
+    "unplugin-auto-import": "^0.7.1",
+    "unplugin-vue-components": "^0.19.5",
     "vue-cli-plugin-electron-builder": "~2.1.1"
   },
   "eslintConfig": {
@@ -55,4 +63,6 @@
     "not dead",
     "not ie 11"
   ]
+
+
 }

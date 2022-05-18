@@ -1,10 +1,19 @@
+<script setup >
+
+import { darkTheme } from 'naive-ui'
+
+</script>
+
 <template>
+  <div id="app">
+    <n-config-provider :theme="darkTheme">
     <router-view></router-view>
+  </n-config-provider>
+  </div>
 </template>
 
-<style>
-* {
-  margin: 0;
-  padding: 0;
-}
+<style  scope>
+  /* #app{
+    background:#101014
+  } */
 </style>

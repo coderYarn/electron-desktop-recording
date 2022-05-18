@@ -47,7 +47,7 @@ export default defineComponent({
   }
 })
 </script>
-<style lang="scss" scoped>
+<style  scoped>
 html,body{
   border-radius:50%;
 
@@ -59,6 +59,11 @@ html,body{
   width: 100vw;
   padding:3px;
   box-sizing: border-box;
+
+  background: transparent;
+  overflow: hidden;
+
+}
   .ball{
     background:skyblue;
     box-sizing: border-box;
@@ -70,5 +75,4 @@ html,body{
     align-items: center;
     color: #fff;
   }
-}
 </style>

@@ -1,55 +1,54 @@
 <template>
-
   <Layer>
-    <div class="recordMain">
-      <div class="content">
-        <div class="btnBox">
-          <div>
-            <div class="btn" @click="sourceStart">
-              {{ isRecord ? '结束录制' : '录屏' }}
-            </div>
-            <div class="timer">{{ transTime(timestamp) }}</div>
+    <n-grid>
+      <n-gi span="10">
+        <div class="content">
+          <n-dialog-provider>
+            <start-btn
+              @sourceStart="sourceStart"
+              @recrodWin="recrodWin"
+              :sourceList="sourceList"
+              :timestamp="timestamp"
+              :isRecord="isRecord"
+            />
+          </n-dialog-provider>
+          <div class="videoList">
+            <x-table
+              @handlerPlay="handlerPlay"
+              @openDir="openDir"
+              :files="files"
+            />
           </div>
         </div>
-        <div class="videoList">
-          <div class="list">
-            <div class="table">
-                     <div class="table-line" >
-                <div>片原名</div>
-                <div>
-                  播放
-                </div>
-                <div >打开文件目录</div>
-              </div>
-              <div class="table-line" :key="item" v-for="item in files">
-                <div>{{ item }}</div>
-                <div @click="handlerPlay(item)" v-if="sourceList.length > 0 ? true : false">
-                  播放
-                </div>
-                <div @click="openDir(item)">打开文件目录</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="preview">
-        <!-- <video :src="previewImg"></video> -->
-        <img :src="previewImg" v-if="videoUrl === ''" />
-        <video controls :src="`http://localhost:9000/${videoUrl}`" v-else></video>
-      </div>
-    </div>
 
-    <RecordList @exitDia="exitDia" @recrodWin="recrodWin" :sourceList="sourceList" :show="show" />
+      </n-gi>
+      <n-gi span="14">
+        <div class="media">
+          <img :src="previewImg" v-if="videoUrl === ''" />
+          <video
+            controls
+            autoplay
+            :src="`http://localhost:9000/${videoUrl}`"
+            v-else
+          ></video>
+
+        </div>
+      </n-gi>
+    </n-grid>
   </Layer>
 </template>
 
-<script>
+<script >
 import Layer from '../components/Layer/Layer.vue'
-import RecordList from '../components/Layer/RecordList.vue'
+
 import { ref, defineComponent } from 'vue'
-import { saveVideo, directoryFiles } from '../utils/helper'
+import { saveVideo, directoryFiles, timeFormat } from '../utils/helper'
+
+import XTable from '@/components/Table'
+import StartBtn from '../components/StartBtn/StartBtn.vue'
 
 const { ipcRenderer } = window.require('electron')
+
 const getSource = () => {
   return new Promise((resolve) => {
     ipcRenderer.send('resolve-desktop')
@@ -62,7 +61,10 @@ const getSource = () => {
 export default defineComponent({
   components: {
     Layer,
-    RecordList
+
+    XTable,
+    StartBtn
+
   },
   setup () {
     const previewImg = ref('')
@@ -73,33 +75,18 @@ export default defineComponent({
     const timestamp = ref(0)
     const sourceList = ref([])
     const sourceId = ref(null)
-    const show = ref(false)
+
     const countDown = () => {
       timestamp.value++
       timer.value = setTimeout(() => {
         countDown()
       }, 1000)
     }
-    const transTime = (time) => {
-      const h =
-        Math.floor(time / 3600) < 10
-          ? '0' + Math.floor(time / 3600)
-          : Math.floor(time / 3600)
-      const m =
-        Math.floor((time / 60) % 60) < 10
-          ? '0' + Math.floor((time / 60) % 60)
-          : Math.floor((time / 60) % 60)
-      const s =
-        Math.floor(time % 60) < 10
-          ? '0' + Math.floor(time % 60)
-          : Math.floor(time % 60)
-      return `${h}:${m}:${s}`
-    }
     files.value = directoryFiles()
     const getPreview = async () => {
       const source = await getSource()
 
-      previewImg.value = source[0].thumbnail.toDataURL() // 'source.thumbnail.toDataURL()'
+      previewImg.value = source[0].thumbnail.toDataURL()
     }
 
     const recordStart = (stream) => {
@@ -132,7 +119,6 @@ export default defineComponent({
       }
     }
     const sourceStart = async () => {
-      if (show.value) return
       const source = await getSource()
 
       sourceList.value = source.map((item) => {
@@ -143,10 +129,7 @@ export default defineComponent({
       })
 
       if (isRecord.value) {
-        show.value = false
         ipcRenderer.send('stopRecord')
-      } else {
-        show.value = true
       }
     }
     ipcRenderer.on('record-stop', () => {
@@ -172,22 +155,21 @@ export default defineComponent({
     })
     const videoUrl = ref('')
     const handlerPlay = (item) => {
+      console.log(item)
       videoUrl.value = item
     }
     const openDir = (item) => {
       ipcRenderer.send('directory-open', item)
     }
-    const exitDia = (flag) => {
-      show.value = flag
-    }
+
     const recrodWin = (item) => {
       sourceId.value = item.id
-      show.value = item.show
       if (!isRecord.value) {
         ipcRenderer.send('startRecord')
       }
     }
     getPreview()
+
     return {
       previewImg,
       recordStart,
@@ -195,80 +177,28 @@ export default defineComponent({
       isRecord,
       files,
       timestamp,
-      transTime,
+      timeFormat,
       handlerPlay,
       videoUrl,
       openDir,
       sourceList,
-      show,
-      recrodWin,
-      exitDia
+      recrodWin
     }
   }
 })
 </script>
 
-<style scope>
-.recordMain {
-  width: 100%;
-  height: 100%;
-  display: flex;
-}
-
-.content {
-  width: 40%;
-}
-
-.preview {
-  display: flex;
-  align-items: center;
-  width: 60%;
-  height: calc(100vh - 50px);
-  padding: 10px;
-  box-sizing: border-box;
-}
-
-.btnBox {
-  height: 20vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.btn {
-  background: red;
-  width: 8vh;
-  height: 8vh;
-  border-radius: 50%;
-  text-align: center;
-  line-height: 8vh;
-  color: #fff;
-  font-weight: bold;
-}
-
+<style scope lang="scss">
 .videoList {
   height: calc(80vh - 50px);
   padding: 15px;
   box-sizing: border-box;
 }
 
-.list {
-  border: solid 1px red;
+.media {
   height: 100%;
-  border-radius: 10px;
-  overflow-y: scroll;
-}
-
-.table {
-  padding: 0 10px;
-  box-sizing: border-box;
-}
-
-.table-line {
   display: flex;
-  justify-content: space-around;
-  border-bottom: solid red 1px;
-  height: 30px;
+  justify-content: center;
   align-items: center;
 }
 
@@ -282,9 +212,5 @@ video {
   width: 100%;
   background: #ccc;
   background-size: cover;
-}
-
-.item {
-  cursor: pointer;
 }
 </style>

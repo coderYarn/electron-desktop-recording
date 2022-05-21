@@ -4,20 +4,11 @@
       <n-gi span="10">
         <div class="content">
           <n-dialog-provider>
-            <start-btn
-              @sourceStart="sourceStart"
-              @recrodWin="recrodWin"
-              :sourceList="sourceList"
-              :timestamp="timestamp"
-              :isRecord="isRecord"
-            />
+            <start-btn @sourceStart="sourceStart" @recrodWin="recrodWin" :sourceList="sourceList" :timestamp="timestamp"
+              :isRecord="isRecord" />
           </n-dialog-provider>
           <div class="videoList">
-            <x-table
-              @handlerPlay="handlerPlay"
-              @openDir="openDir"
-              :files="files"
-            />
+            <x-table @handlerPlay="handlerPlay" @openDir="openDir" :files="files" />
           </div>
         </div>
 
@@ -25,13 +16,7 @@
       <n-gi span="14">
         <div class="media">
           <img :src="previewImg" v-if="videoUrl === ''" />
-          <video
-            controls
-            autoplay
-            :src="`http://localhost:9000/${videoUrl}`"
-            v-else
-          ></video>
-
+          <video controls autoplay :src="`http://localhost:9000/${videoUrl}`" v-else></video>
         </div>
       </n-gi>
     </n-grid>
@@ -68,6 +53,7 @@ export default defineComponent({
   },
   setup () {
     const previewImg = ref('')
+
     const isRecord = ref(false)
     const recorder = ref(null)
     const files = ref([])

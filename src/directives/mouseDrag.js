@@ -5,7 +5,6 @@ const MouseDragDirective = {
     let baseX = 0
     let baseY = 9
     el.addEventListener('mousedown', function (e) {
-      console.log('mouseDown')
       isDown = true
       baseX = e.x
       baseY = e.y

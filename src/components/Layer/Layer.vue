@@ -1,6 +1,6 @@
 <template>
   <div class="layer">
-    <header v-mouse-drag="handleDrag" v-mouse-db="handlerMaximize">
+    <header v-mouse-drag="handleDrag">
       <div class="logo">Logo</div>
       <div class="muen">
         <div class="item" @click="handlerMinimize">
@@ -55,10 +55,11 @@ export default defineComponent({
     const handleDrag = (pos) => {
       ipcRenderer.send('move-main', pos)
     }
-    const handlerMinimize = () => {
+    const handlerMinimize = (e) => {
+      console.log(111)
       ipcRenderer.send('mainwin-minize')
     }
-    const handlerMaximize = () => {
+    const handlerMaximize = (e) => {
       if (isMax.value) {
         isMax.value = false
         ipcRenderer.send('mainwin-maxize')
@@ -67,16 +68,17 @@ export default defineComponent({
         ipcRenderer.send('mainwin-restore')
       }
     }
-    const handlerClose = () => {
+    const handlerClose = (e) => {
       ipcRenderer.send('mainwin-close')
     }
-    const handlerRestore = () => {
+    const handlerRestore = (e) => {
       isMax.value = true
 
       ipcRenderer.send('mainwin-restore')
     }
 
     return {
+
       handleDrag,
       handlerMinimize,
       handlerMaximize,
@@ -117,12 +119,15 @@ header {
   align-items: center;
   height: 100%;
 }
+
 .item:hover {
   background: #111;
 }
+
 .item:nth-child(3):hover {
   background: red;
 }
+
 .layer {
   position: relative;
 }
